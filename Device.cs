@@ -161,7 +161,10 @@
             }
             return games;
         }
-
-        
+        abstract public bool Work();
+        abstract public bool Play();
+        abstract public bool Chat();
+        abstract public bool ListenMusic();
+        abstract public bool WatchVideo();
     }
 }

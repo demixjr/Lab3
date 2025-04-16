@@ -3,7 +3,17 @@
  
     public class ConsoleMenu
     {
-       public Device AddDevice(int num)
+        private ConsoleMenu() { }
+        private static ConsoleMenu instance = null;
+        public static ConsoleMenu GetInstance()
+        {
+            if (instance == null)
+            {
+                instance = new ConsoleMenu();
+            }
+            return instance;
+        }
+        public Device AddDevice(int num)
        {
           
             int cores;

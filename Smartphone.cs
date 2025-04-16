@@ -1,6 +1,6 @@
 ﻿namespace Lab1
 {
-    public class Smartphone : Device, IActions
+    public class Smartphone : Device
     {
 
         public Smartphone(int cores, double clockSpeedGHz, int ram, int rom, int capacity)
@@ -13,7 +13,7 @@
             powerSupply.On += PowerSupply_On;
             powerSupply.Off += PowerSupply_Off;
         }
-        public bool Work()
+        public override bool Work()
         {
             if (isRunning && hasPowerSupply)
             {
@@ -39,7 +39,7 @@
                 throw new Exception("Смартфон не має живлення");
             }
         }
-        public bool Play()
+        public override bool Play()
         {
             if (isRunning && hasPowerSupply && games > 0 && CPU.GetCores() >= 4 && CPU.GetClockSpeedGHz() >= 3.0 && memory.GetRAM() >= 2)
             {
@@ -70,7 +70,7 @@
             }
             return false;
         }
-        public bool Chat()
+        public override bool Chat()
         {
             if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
             {
@@ -103,7 +103,7 @@
 
 
         }
-        public bool ListenMusic()
+        public override bool ListenMusic()
         {
             if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded && hasHeadset)
             {
@@ -141,7 +141,7 @@
           
             return false;
         }
-        public bool WatchVideo()
+        public override bool WatchVideo()
         {
             if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
             {

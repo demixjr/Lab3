@@ -1,6 +1,6 @@
 ﻿namespace Lab1
 {
-    public class Computer: Device, IActions
+    public class Computer: Device
     {
         public Computer(int cores, double clockSpeedGHz, int ram, int rom, bool hasUPS)
         {
@@ -16,7 +16,7 @@
             powerSupply.Off += PowerSupply_Off;
         }
 
-        public bool Work()
+        public override bool Work()
         {
             if (isRunning && hasPowerSupply)
             {
@@ -38,7 +38,7 @@
                 throw new Exception("Комп'ютер не має живлення");
             }
         }
-        public bool Play()
+        public override bool Play()
         {
             if (isRunning && hasPowerSupply && games > 0 && CPU.GetCores() >= 4 && CPU.GetClockSpeedGHz() >= 3.0 && memory.GetRAM() >= 2)
             {
@@ -69,7 +69,7 @@
                 throw new Exception("Комп'ютер не увімкнено");
             }
         }
-        public bool Chat()
+        public override bool Chat()
         {
             if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
             {
@@ -100,7 +100,7 @@
             }
 
         }
-        public bool ListenMusic()
+        public override bool ListenMusic()
         {
             if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded && hasHeadset )
             {
@@ -134,7 +134,7 @@
                 throw new Exception("Комп'ютер не має живлення");
             }
         }
-        public bool WatchVideo()
+        public override bool WatchVideo()
         {
             if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
             {
