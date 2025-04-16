@@ -1,4 +1,6 @@
-﻿namespace Lab1
+﻿using Lab3.ChainOfResponsibility;
+
+namespace Lab3
 {
     public class Computer: Device
     {
@@ -18,151 +20,123 @@
 
         public override bool Work()
         {
-            if (isRunning && hasPowerSupply)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+
+            powerCheck.SetNext(runningCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged())
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(500);
                 battery.DischargeBattery(500);
                 throw new Exception("Джерело безперервного живлення без енергії");
             }
-            else if (hasPowerSupply || (battery != null && battery.IsCharged()))
-            {
-                throw new Exception("Комп'ютер не увімкнено");
-            }
-            else
-            {
-                throw new Exception("Комп'ютер не має живлення");
-            }
+            return false;
         }
         public override bool Play()
         {
-            if (isRunning && hasPowerSupply && games > 0 && CPU.GetCores() >= 4 && CPU.GetClockSpeedGHz() >= 3.0 && memory.GetRAM() >= 2)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            gamesCheck = new GamesCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(gamesCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (games <= 0)
-            {
-                throw new Exception("Ігри на комп'ютері відсутні");
-            }
-            else if (CPU.GetCores() < 4 || CPU.GetClockSpeedGHz() < 3.0 || memory.GetRAM() < 4)
-            {
-                throw new Exception("Комп'ютер слабкий для гри в ігри");
-            }
-            else if (isRunning && battery.IsCharged() && games > 0 && CPU.GetCores() >= 4 && CPU.GetClockSpeedGHz() >= 3.0 && memory.GetRAM() >= 2)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(500);
                 battery.DischargeBattery(500);
                 throw new Exception("Джерело безперервного живлення без енергії");
             }
-            if (!hasPowerSupply)
-            {
-                throw new Exception("Комп'ютер не має живлення");
-            }
-            
-            else 
-            {
-                throw new Exception("Комп'ютер не увімкнено");
-            }
+            return false;
         }
         public override bool Chat()
         {
-            if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            browserCheck = new BrowserCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(browserCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged() && connectedToNetwork && browserDownloaded)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(500);
                 battery.DischargeBattery(500);
                 throw new Exception("Джерело безперервного живлення без енергії");
             }
-            else if (hasPowerSupply || (battery != null && battery.IsCharged()))
-            {
-                throw new Exception("Комп'ютер не увімкнено");
-            }
-            else if(!browserDownloaded)
-            {
-                throw new Exception("Браузер відсутній");
-            }
-            else if(!connectedToNetwork)
-            {
-                throw new Exception("Комп'ютер не підключений до мережі");
-            }
-            else
-            {
-                throw new Exception("Комп'ютер не має живлення");
-            }
-
+            return false;
         }
         public override bool ListenMusic()
         {
-            if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded && hasHeadset )
+
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            browserCheck = new BrowserCheck();
+            headphonesCheck = new HeadphonesCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(browserCheck);
+            browserCheck.SetNext(headphonesCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if(!hasHeadset)
-            {
-                throw new Exception("Гарнітура відсутня");
-            }
-            else if (isRunning && battery != null && battery.IsCharged() && connectedToNetwork && browserDownloaded && hasHeadset)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(500);
                 battery.DischargeBattery(500);
                 throw new Exception("Джерело безперервного живлення без енергії");
             }
-            else if (hasPowerSupply || (battery != null && battery.IsCharged()))
-            {
-                throw new Exception("Комп'ютер не увімкнено");
-            }
-            else if (!browserDownloaded)
-            {
-                throw new Exception("Браузер відсутній");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Комп'ютер не підключений до мережі");
-            }
-            else
-            {
-                throw new Exception("Комп'ютер не має живлення");
-            }
+            return false;
         }
         public override bool WatchVideo()
         {
-            if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            browserCheck = new BrowserCheck();
+            headphonesCheck = new HeadphonesCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(browserCheck);
+            browserCheck.SetNext(headphonesCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged() && connectedToNetwork && browserDownloaded)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(500);
                 battery.DischargeBattery(500);
                 throw new Exception("Джерело безперервного живлення без енергії");
             }
-            else if (hasPowerSupply || ((battery != null && battery.IsCharged())))
-            {
-                throw new Exception("Комп'ютер не увімкнено");
-            }
-            else if (!browserDownloaded)
-            {
-                throw new Exception("Браузер відсутній");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Комп'ютер не підключений до мережі");
-            }
-            else
-            {
-                throw new Exception("Комп'ютер не має живлення");
-            }
+            return false;
+        }
         }
     }
-}
+

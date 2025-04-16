@@ -1,4 +1,6 @@
-﻿namespace Lab1
+﻿using Lab3.ChainOfResponsibility;
+
+namespace Lab3
 {
     
     abstract public class Device
@@ -15,8 +17,52 @@
         protected bool browserDownloaded;
         public bool hasHeadset;
 
+        protected IsRunningCheck runningCheck;
+        protected PowerCheck powerCheck;
+        protected NetworkCheck networkCheck;
+        protected MemoryCheck memoryCheck;
+        protected BrowserCheck browserCheck;
+        protected GamesCheck gamesCheck;
+        protected HeadphonesCheck headphonesCheck;
+       
         protected int games = 0;
        
+        public CPU GetCPU()
+        {
+            return CPU;
+        }
+        public Memory GetMemory() 
+        { 
+            return memory;
+        }
+
+        public Battery GetBattery()
+        {
+            return battery;
+        }
+        public bool HasPowerSupply()
+        {
+            return hasPowerSupply;
+        }
+        public bool IsRunning()
+        {
+            return isRunning;
+        }
+        public bool IsConnectedToNetwork()
+        {
+            return connectedToNetwork;
+        }
+        public bool IsBrowserDownloaded()
+        {
+            return browserDownloaded;
+        }
+        public bool HasGames()
+        {
+            if (games > 0)
+                return true;
+            else
+                return false;
+        }
         public void PowerSupply_Off()
         {
             if (!hasPowerSupply)
@@ -40,32 +86,10 @@
         }
         public bool RunDevice()
         {
-            if (hasPowerSupply)
-            {
-                isRunning = true;
-                return isRunning;
-            }
-            else if(!hasPowerSupply && battery == null)
-            {
-                throw new Exception("Джерело безперервного живлення відсутнє");
-            }
-            else if (!hasPowerSupply && battery != null )
-            {
-                if (!battery.IsCharged())
-                {
-                    throw new Exception("Немає енергії");
-                }
-                isRunning = true;
-                return isRunning;      
-            }
-            else if (isRunning)
-            {
-                throw new Exception("Пристрій вже увімкнено");
-            }
-            else if (battery != null && !battery.IsCharged())
-                throw new Exception("Немає енергії");
-            else
-                return false;
+            powerCheck = new PowerCheck();
+            powerCheck.Check(this);
+            isRunning = true;
+            return isRunning;
         }
 
         public bool CloseDevice()
@@ -79,28 +103,13 @@
 
         public bool ConnectToNetwork()
         {
-            if(connectedToNetwork)
-            {
-                throw new Exception("Пристрій вже має підключення");
-            }
-            else if(isRunning && hasPowerSupply)
-            {
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+
+            powerCheck.SetNext(runningCheck);
+            if (powerCheck.Check(this))
                 connectedToNetwork = true;
-                return connectedToNetwork;
-            }
-            else if(isRunning && (battery != null && battery.IsCharged()))
-            {
-                connectedToNetwork = true;
-                return connectedToNetwork;
-            }
-            else if (hasPowerSupply || (battery != null && battery.IsCharged()))
-            {
-                throw new Exception("Увімкніть пристрій");
-            }
-            else
-            {
-                throw new Exception("Пристрій розряджений");
-            }
+            return connectedToNetwork;
         }
         public bool ChargeBattery()
         {
@@ -115,52 +124,41 @@
         }
         public bool DownloadBrowser()
         {
-            if(browserDownloaded)
-            {
-                throw new Exception("Браузер вже є на пристрої");
-            }
-            if(isRunning && memory.FreeROM() > 1 && connectedToNetwork)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            memoryCheck = new MemoryCheck(1);
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(memoryCheck);
+
+            if (powerCheck.Check(this))
             {
                 browserDownloaded = true;
                 memory.AllocateROM(1);
-                return browserDownloaded;
             }
-            else if(!isRunning)
-            {
-                throw new Exception("Увімкніть пристрій");
-            }
-            else if (memory.FreeROM() <= 1)
-            {
-                throw new Exception("Недостатньо місця");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Підключення до мережі відсутнє");
-            }
-            return false;
+            return browserDownloaded;
         }
         public int DownloadGame()
         {
-            if (isRunning && memory.FreeROM() > 10 && connectedToNetwork)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            memoryCheck = new MemoryCheck(10);
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(memoryCheck);
+
+            if (powerCheck.Check(this))
             {
                 games += 1;
                 memory.AllocateROM(10);
-                return games;
-            }
-            else if(!isRunning)
-            {
-                throw new Exception("Увімкніть пристрій");
-            }
-            else if (memory.FreeROM() <= 1)
-            {
-                throw new Exception("Недостатньо місця");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Підключення до мережі відсутнє");
             }
             return games;
         }
+          
         abstract public bool Work();
         abstract public bool Play();
         abstract public bool Chat();

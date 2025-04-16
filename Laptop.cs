@@ -1,4 +1,6 @@
-﻿namespace Lab1
+﻿using Lab3.ChainOfResponsibility;
+
+namespace Lab3
 {
     public class Laptop : Device
     {
@@ -13,165 +15,124 @@
             powerSupply.On += PowerSupply_On;
             powerSupply.Off += PowerSupply_Off;
         }
-
         public override bool Work()
         {
-            if (isRunning && hasPowerSupply)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+
+            powerCheck.SetNext(runningCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged())
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(1000);
                 battery.DischargeBattery(580);
                 return true;
             }
-            else if (hasPowerSupply || (battery != null && battery.IsCharged()))
-            {
-                throw new Exception("Ноутбук не увімкнений");
-            }
-            else if(!hasPowerSupply && battery != null && !battery.IsCharged())
-            {
-                throw new Exception("Ноутбук розряджений");
-            }
-            else
-            {
-                throw new Exception("Ноутбук не має живлення");
-            }
+            return false;
         }
         public override bool Play()
         {
-            if (isRunning && hasPowerSupply && games > 0 && CPU.GetCores() >= 4 && CPU.GetClockSpeedGHz() >= 3.0 && memory.GetRAM() >= 2)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            gamesCheck = new GamesCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(gamesCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if(!isRunning)
-            {
-                throw new Exception("Ноутбук не увімкнений");
-            }
-            else if (games <= 0)
-            {
-                throw new Exception("Ігри на ноутбуці відсутні");
-            }
-            else if (CPU.GetCores() < 4 || CPU.GetClockSpeedGHz() < 3.0 || memory.GetRAM() < 4)
-            {
-                throw new Exception("Ноутбук слабкий для гри в ігри");
-            }
-            else if (isRunning && battery.IsCharged() && games > 0 && CPU.GetCores() >= 4 && CPU.GetClockSpeedGHz() >= 3.0 && memory.GetRAM() >= 2)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(500);
                 battery.DischargeBattery(1750);
                 return true;
             }
-            else if (!hasPowerSupply || (battery != null && !battery.IsCharged()))
-            {
-                throw new Exception("Ноутбук розряджений");
-            }
             return false;
         }
         public override bool Chat()
         {
-            if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            browserCheck = new BrowserCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(browserCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged() && connectedToNetwork && browserDownloaded)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(1000);
                 battery.DischargeBattery(580);
                 return true;
             }
-            else if (hasPowerSupply || (battery != null && battery.IsCharged()))
-            {
-                throw new Exception("Ноутбук не увімкнений");
-            }
-            else if (!hasPowerSupply || (battery != null && !battery.IsCharged()))
-            {
-                throw new Exception("Ноутбук розряджений");
-            }
-            else if (!browserDownloaded)
-            {
-                throw new Exception("Браузер відсутній");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Ноутбук не підключений до мережі");
-            }
             return false;
-            
-
         }
         public override bool ListenMusic()
         {
-            if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded && hasHeadset)
+
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            browserCheck = new BrowserCheck();
+            headphonesCheck = new HeadphonesCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(browserCheck);
+            browserCheck.SetNext(headphonesCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged() && connectedToNetwork && browserDownloaded && hasHeadset)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(1000);
                 battery.DischargeBattery(580);
                 return true;
             }
-            else if (!isRunning && (hasPowerSupply || (battery != null && battery.IsCharged())))
-            {
-                throw new Exception("Ноутбук не увімкнений");
-            }
-            else if (!browserDownloaded)
-            {
-                throw new Exception("Браузер відсутній");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Ноутбук не підключений до мережі");
-            }
-            else if (!hasHeadset)
-            {
-                throw new Exception("Гарнітура відсутня");
-            }
-            else if (!hasPowerSupply || (battery != null && !battery.IsCharged()))
-            {
-                throw new Exception("Ноутбук розряджений");
-            }
-             
-            
             return false;
         }
         public override bool WatchVideo()
         {
-            if (isRunning && hasPowerSupply && connectedToNetwork && browserDownloaded)
+            powerCheck = new PowerCheck();
+            runningCheck = new IsRunningCheck();
+            networkCheck = new NetworkCheck();
+            browserCheck = new BrowserCheck();
+            headphonesCheck = new HeadphonesCheck();
+
+            powerCheck.SetNext(runningCheck);
+            runningCheck.SetNext(networkCheck);
+            networkCheck.SetNext(browserCheck);
+            browserCheck.SetNext(headphonesCheck);
+
+            if (powerCheck.Check(this) && hasPowerSupply)
             {
                 Thread.Sleep(1000);
                 return true;
             }
-            else if (isRunning && battery != null && battery.IsCharged() && connectedToNetwork && browserDownloaded)
+            else if (powerCheck.Check(this))
             {
                 Thread.Sleep(1000);
                 battery.DischargeBattery(1750);
                 return true;
             }
-            else if (!isRunning && (hasPowerSupply || (battery != null && battery.IsCharged())))
-            {
-                throw new Exception("Ноутбук не увімкнений");
-            }
-            else if (!browserDownloaded)
-            {
-                throw new Exception("Браузер відсутній");
-            }
-            else if (!connectedToNetwork)
-            {
-                throw new Exception("Ноутбук не підключений до мережі");
-            }
-            else if (!hasPowerSupply || (battery != null && !battery.IsCharged()))
-            {
-                throw new Exception("Ноутбук розряджений");
-            }
-            
             return false;
-            }
+        }
         }
     }
