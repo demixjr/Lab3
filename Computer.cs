@@ -1,5 +1,5 @@
 ﻿using Lab3.ChainOfResponsibility;
-
+using Lab3.Observer;
 namespace Lab3
 {
     public class Computer: Device
@@ -14,10 +14,12 @@ namespace Lab3
                 battery = new Battery(500);
             }
 
-            powerSupply.On += PowerSupply_On;
-            powerSupply.Off += PowerSupply_Off;
+            SubscribeToPowerSupply(powerSupply);
         }
-
+        protected override void OnPowerChanged(object sender, PowerSupplyChangedEventArgs e)
+        {
+            hasPowerSupply = e.IsPoweredOn;
+        }
         public override bool Work()
         {
             powerCheck = new PowerCheck();

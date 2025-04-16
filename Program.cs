@@ -1,9 +1,12 @@
-﻿namespace Lab3
+﻿using Lab3.Observer;
+
+namespace Lab3
 {
-    internal class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
+            
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             bool exit = false;
            
@@ -70,7 +73,7 @@
                                     Console.WriteLine($"[{DateTime.Now:HH:mm:ss}]Девайс запущено");
                                     break;
                                 case 2:
-                                    device.PowerSupply_On();
+                                    device.powerSupply.TurnOn();
                                     Console.WriteLine($"[{DateTime.Now:HH:mm:ss}]Живлення під'єднано");
                                     break;
                                 case 3:
@@ -191,7 +194,7 @@
                                     }
                                     break;
                                 case 13:
-                                    device.PowerSupply_Off();
+                                    device.powerSupply.TurnOff();
                                     Console.WriteLine($"[{DateTime.Now:HH:mm:ss}]Живлення вимкнено");
                                     break;
                                 case 14:

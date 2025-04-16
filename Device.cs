@@ -1,14 +1,15 @@
 ﻿using Lab3.ChainOfResponsibility;
+using Lab3.Observer;
 
 namespace Lab3
 {
-    
+
     abstract public class Device
     {
 
         protected CPU CPU;
         protected Memory memory;
-        protected PowerSupply powerSupply;
+        public PowerSupply powerSupply;
         protected Battery battery;
 
         protected bool hasPowerSupply;
@@ -26,7 +27,16 @@ namespace Lab3
         protected HeadphonesCheck headphonesCheck;
        
         protected int games = 0;
-       
+
+        public virtual void SubscribeToPowerSupply(PowerSupply powerSupply)
+        {
+            powerSupply.PowerChanged += OnPowerChanged;
+        }
+
+        protected virtual void OnPowerChanged(object sender, PowerSupplyChangedEventArgs e)
+        {
+            hasPowerSupply = e.IsPoweredOn;
+        }
         public CPU GetCPU()
         {
             return CPU;
